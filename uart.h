@@ -10,6 +10,9 @@
 #define MSG_TYPE_HID_INFO       0x07
 #define MSG_TYPE_STARTUP        0x08
 #define MSG_TYPE_DEBUG          0x09
+#define MSG_TYPE_UART_INIT      0x0a
+#define MSG_TYPE_UART_IN        0x0b
+#define MSG_TYPE_UART_OUT       0x0c
 
 void processUart();
 void sendHidPollMSG(unsigned char msgtype, unsigned short length, unsigned char type, unsigned char device, unsigned char endpoint, unsigned char __xdata *msgbuffer,unsigned char idVendorL,unsigned char idVendorH,unsigned char idProductL,unsigned char idProductH);

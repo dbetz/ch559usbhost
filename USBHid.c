@@ -209,13 +209,14 @@ void parseHIDDeviceReport(unsigned char __xdata *report, unsigned short length, 
 
 unsigned char getHIDDeviceReport(PXHIDdevice device)
 {
- 	unsigned char s;
+ 	PXUSBdevice usbDevice = device->usbDevice;
+    unsigned char s;
 	unsigned short len, i, reportLen = RECEIVE_BUFFER_LEN;
 	DEBUG_OUT("Requesting report from interface %i\n", device->interface);
 
 	fillTxBuffer(SetHIDIdleRequest, sizeof(SetHIDIdleRequest));
 	((PXUSB_SETUP_REQ)TxBuffer)->wIndexL = device->interface;	
-	s = hostCtrlTransfer(receiveDataBuffer, &len, 0);
+	s = hostCtrlTransfer(usbDevice, receiveDataBuffer, &len, 0);
 	
 	//todo really dont care if successful? 8bitdo faild here
 	//if(s != ERR_SUCCESS)
@@ -225,7 +226,7 @@ unsigned char getHIDDeviceReport(PXHIDdevice device)
 	((PXUSB_SETUP_REQ)TxBuffer)->wIndexL = device->interface;
 	((PXUSB_SETUP_REQ)TxBuffer)->wLengthL = (unsigned char)(reportLen & 255); 
 	((PXUSB_SETUP_REQ)TxBuffer)->wLengthH = (unsigned char)(reportLen >> 8);
-	s = hostCtrlTransfer(receiveDataBuffer, &len, RECEIVE_BUFFER_LEN);
+	s = hostCtrlTransfer(usbDevice, receiveDataBuffer, &len, RECEIVE_BUFFER_LEN);
 	if(s != ERR_SUCCESS)
 		return s;
 	

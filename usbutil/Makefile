@@ -7,8 +7,7 @@ CFLAGS += -DRASPBERRY_PI -Wno-psabi -pthread -latomic
 CPPFLAGS += $(CFLAGS) -std=c++14
 LIBS += -lstdc++ -lpigpio -ludev -Wl,-Bstatic -lwebsockets -lssl -lcrypto -Wl,-Bdynamic -ldl -s
 
-
-TARGET=rdmServer
+TARGET=usbutil
 
 OBJS=\
 ${BUILD_DIR}/main.o \

@@ -67,16 +67,16 @@ static uint32_t calculate_baudrate(uint32_t baudrate, uint16_t *wValue, uint16_t
     return baudrate_real;
 }
 
-static unsigned char ftdi_reset()
+static unsigned char ftdi_reset(PXUSBdevice usbDevice)
 {
 	unsigned char s;
     unsigned short len;
 	fillTxBuffer(ftdi_ResetRequest, sizeof(ftdi_ResetRequest));
-    s = hostCtrlTransfer(receiveDataBuffer, &len, RECEIVE_BUFFER_LEN);             
+    s = hostCtrlTransfer(usbDevice, receiveDataBuffer, &len, RECEIVE_BUFFER_LEN);             
 	return s;                          
 }
 
-static unsigned char ftdi_setBaudRate(uint32_t baudRate)
+static unsigned char ftdi_setBaudRate(PXUSBdevice usbDevice, uint32_t baudRate)
 {
 	PXUSB_SETUP_REQ pSetupReq = ((PXUSB_SETUP_REQ)TxBuffer);
     uint16_t wIndex, wValue;
@@ -88,11 +88,11 @@ static unsigned char ftdi_setBaudRate(uint32_t baudRate)
     pSetupReq->wValueH = wValue >> 8;
     pSetupReq->wIndexL = wIndex;
     pSetupReq->wIndexH = wIndex >> 8;
-    s = hostCtrlTransfer(receiveDataBuffer, &len, RECEIVE_BUFFER_LEN);             
+    s = hostCtrlTransfer(usbDevice, receiveDataBuffer, &len, RECEIVE_BUFFER_LEN);             
 	return s;                          
 }
 
-static unsigned char ftdi_setCharCoding(uint8_t dataBits, uint8_t parityType, uint8_t charFormat)
+static unsigned char ftdi_setCharCoding(PXUSBdevice usbDevice, uint8_t dataBits, uint8_t parityType, uint8_t charFormat)
 {
 	PXUSB_SETUP_REQ pSetupReq = ((PXUSB_SETUP_REQ)TxBuffer);
     uint16_t wValue = dataBits | (parityType << 8) | (charFormat << 11);
@@ -101,7 +101,7 @@ static unsigned char ftdi_setCharCoding(uint8_t dataBits, uint8_t parityType, ui
 	fillTxBuffer(ftdi_SetCharCodingRequest, sizeof(ftdi_SetCharCodingRequest));
     pSetupReq->wValueL = wValue;
     pSetupReq->wValueH = wValue >> 8;
-    s = hostCtrlTransfer(receiveDataBuffer, &len, RECEIVE_BUFFER_LEN);             
+    s = hostCtrlTransfer(usbDevice, receiveDataBuffer, &len, RECEIVE_BUFFER_LEN);             
 	return s;                          
 }
 
@@ -110,20 +110,20 @@ int ftdi_check(PXUSBdevice usbDevice)
     return usbDevice->VendorID == FT232_VENDOR_ID && usbDevice->ProductID == FT232_PRODUCT_ID;
 }
 
-void ftdi_initialize()
+void ftdi_initialize(PXUSBdevice usbDevice)
 {
 	unsigned char s;
-    s = ftdi_reset();
+    s = ftdi_reset(usbDevice);
     if (s == ERR_SUCCESS) {
         DEBUG_OUT("Got FTDI reset response\n");
         DEBUG_OUT_USB_BUFFER(receiveDataBuffer);
     }
-    s = ftdi_setBaudRate(230400);
+    s = ftdi_setBaudRate(usbDevice, 230400);
     if (s == ERR_SUCCESS) {
         DEBUG_OUT("Got FTDI set baud rate response\n");
         DEBUG_OUT_USB_BUFFER(receiveDataBuffer);
     }
-    s = ftdi_setCharCoding(8, 0, 0);
+    s = ftdi_setCharCoding(usbDevice, 8, 0, 0);
     if (s == ERR_SUCCESS) {
         DEBUG_OUT("Got FTDI set char coding response\n");
         DEBUG_OUT_USB_BUFFER(receiveDataBuffer);
@@ -133,5 +133,12 @@ void ftdi_initialize()
 void ftdi_inHandler(PXHIDdevice hidDevice, PXUCHAR buf, unsigned char len) __reentrant
 {
     PXUSBdevice usbDevice = hidDevice->usbDevice;
-    DEBUG_OUT("Got hub port status\n");
+    if (len >= 2) {
+        DEBUG_OUT("Got FTDI input: modem 0x%02x, line 0x%02x\n", buf[0], buf[1]);
+        for (int i = 2; i < len; ++i) {
+            DEBUG_OUT(" %02x", buf[i]);
+        }
+        DEBUG_OUT("\n");
+    }
+    sendProtocolMSG(MSG_TYPE_UART_IN, len, 0, 0, 0, buf);
 }

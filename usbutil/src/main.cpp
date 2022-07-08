@@ -113,7 +113,7 @@ bool Start()
     cout << "Using " << serialportName << endl;
     serialport = make_unique<SerialPort>(serialportName);
     if (!serialport->Open()) {
-        cout << "Failed to connect to RDM" << endl;
+        cout << "Failed to connect to the CH559" << endl;
         serialport = nullptr;
         return false;
     }

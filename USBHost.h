@@ -1,6 +1,11 @@
 #ifndef __USBHOST_H__
 #define __USBHOST_H__
 
+#ifndef TRUE
+#define TRUE    1
+#define FALSE   0
+#endif
+
 typedef const unsigned char __code *PUINT8C;
 typedef unsigned char __xdata *PXUCHAR;
 
@@ -14,7 +19,6 @@ typedef unsigned char __xdata *PXUCHAR;
 #define ENDPOINT_OUT            0
 #define ENDPOINT_IN             1
 
-
 #define ERR_SUCCESS         0x00
 #define ERR_USB_CONNECT     0x15
 #define ERR_USB_DISCON      0x16
@@ -27,7 +31,6 @@ typedef unsigned char __xdata *PXUCHAR;
 #define ROOT_DEVICE_DISCONNECT  0
 #define ROOT_DEVICE_CONNECTED   1
 #define ROOT_DEVICE_FAILED      2
-#define ROOT_DEVICE_SUCCESS     3
 
 /*#define DEV_TYPE_KEYBOARD   ( USB_DEV_CLASS_HID | 0x20 )
 #define DEV_TYPE_MOUSE      ( USB_DEV_CLASS_HID | 0x30 )
@@ -101,6 +104,7 @@ typedef ConnectedDevice __xdata *PXConnectedDevice;
 
 typedef struct
 {
+    int             InUse;
 	unsigned char   DeviceClass;
 	unsigned char   MaxPacketSize0;
 	
@@ -137,10 +141,12 @@ unsigned char checkRootHubConnections();
 void resetHubDevices(unsigned char hubindex);
 void pollHIDdevice();
 
+PXUSBdevice addUSBdevice(unsigned char rootHubIndex);
 void selectHubPort(unsigned char rootHubIndex, unsigned char addr);
 void fillTxBuffer(PUINT8C data, unsigned char len);
-unsigned char hostCtrlTransfer(unsigned char __xdata *DataBuf, unsigned short *RetLen, unsigned short maxLenght);
+unsigned char hostCtrlTransfer(PXUSBdevice usbDevice, unsigned char __xdata *DataBuf, unsigned short *RetLen, unsigned short maxLength);
 void DEBUG_OUT_USB_BUFFER(unsigned char __xdata *usbBuffer);
+unsigned char initializeConnection(PXUSBdevice usbDevice);
 
 #define RECEIVE_BUFFER_LEN    512
 extern __xdata unsigned char receiveDataBuffer[RECEIVE_BUFFER_LEN];
@@ -157,12 +163,12 @@ void hid_inHandler(PXHIDdevice hidDevice, PXUCHAR buf, unsigned char len) __reen
 unsigned char hub_initialize(PXUSBdevice usbDevice);
 unsigned char hub_getHubStatus(PXUSBdevice usbDevice);
 unsigned char hub_setPortFeature(PXUSBdevice usbDevice, unsigned char port, unsigned char feature);
-unsigned char hub_getPortStatus(PXUSBdevice usbDevice, unsigned char port);
+unsigned char hub_getPortStatus(PXUSBdevice usbDevice, unsigned char port, unsigned short *pStatus, unsigned short *pChange);
 void hub_inHandler(PXHIDdevice hidDevice, PXUCHAR buf, unsigned char len) __reentrant;
 
 // USBFtdi.c
 int ftdi_check(PXUSBdevice usbDevice);
-void ftdi_initialize();
+void ftdi_initialize(PXUSBdevice usbDevice);
 void ftdi_inHandler(PXHIDdevice hidDevice, PXUCHAR buf, unsigned char len) __reentrant;
 
 #endif
