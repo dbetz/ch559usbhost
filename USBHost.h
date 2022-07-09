@@ -47,24 +47,24 @@ typedef unsigned char __xdata *PXUCHAR;
 
 typedef struct _EndPoint
 {
-	unsigned char EndpointAddr;
-	unsigned short MaxPacketSize;
-	
-	unsigned char EndpointDir : 1;
-	unsigned char TOG : 1;
+    unsigned char EndpointAddr;
+    unsigned short MaxPacketSize;
+    
+    unsigned char EndpointDir : 1;
+    unsigned char TOG : 1;
 } EndPoint, *PEndPoint;
 
 typedef struct _HIDSegmentStructure
 {
-	unsigned char KeyboardReportId;
-	unsigned char MouseReportId;
-	
-	struct
-	{
-		unsigned char start;
-		unsigned char size;
-		unsigned char count;
-	} HIDSeg[HID_SEG_COUNT];
+    unsigned char KeyboardReportId;
+    unsigned char MouseReportId;
+    
+    struct
+    {
+        unsigned char start;
+        unsigned char size;
+        unsigned char count;
+    } HIDSeg[HID_SEG_COUNT];
 } HIDSegmentStructure;
 
 #define HID_KEYBOARD_VAL_LEN           6
@@ -72,32 +72,32 @@ typedef struct _HIDSegmentStructure
 
 typedef struct _KeyboardParseStruct
 {
-	unsigned char   KeyboardVal[HID_KEYBOARD_VAL_LEN];
-	unsigned char   KeyboardBitVal[MAX_HID_KEYBOARD_BIT_VAL_LEN];
+    unsigned char   KeyboardVal[HID_KEYBOARD_VAL_LEN];
+    unsigned char   KeyboardBitVal[MAX_HID_KEYBOARD_BIT_VAL_LEN];
 } KeyboardParseStruct;
 
 typedef struct _Interface
 {
-	unsigned char       InterfaceClass;
-	unsigned char       InterfaceProtocol;
-	
-	unsigned char       EndpointCount;
-	EndPoint            endpoint[MAX_ENDPOINT_COUNT];
-	
-	HIDSegmentStructure HidSegStruct;	
+    unsigned char       InterfaceClass;
+    unsigned char       InterfaceProtocol;
+    
+    unsigned char       EndpointCount;
+    EndPoint            endpoint[MAX_ENDPOINT_COUNT];
+    
+    HIDSegmentStructure HidSegStruct;   
 
-	KeyboardParseStruct KeyboardParseStruct;
+    KeyboardParseStruct KeyboardParseStruct;
 } Interface, *PInterface;
 
 typedef Interface __xdata *PXInterface;
 
 typedef struct _ConnectedDevice 
 {
-	unsigned char connected;
-	unsigned char rootHub;
-	unsigned char interface;
-	unsigned char endPoint;
-	unsigned long type;
+    unsigned char connected;
+    unsigned char rootHub;
+    unsigned char interface;
+    unsigned char endPoint;
+    unsigned long type;
 } ConnectedDevice, *PConnectedDevice;
 
 typedef ConnectedDevice __xdata *PXConnectedDevice;
@@ -105,18 +105,18 @@ typedef ConnectedDevice __xdata *PXConnectedDevice;
 typedef struct
 {
     int             InUse;
-	unsigned char   DeviceClass;
-	unsigned char   MaxPacketSize0;
-	
-	unsigned short  VendorID;
-	unsigned short  ProductID;
-	unsigned short  bcdDevice;
+    unsigned char   DeviceClass;
+    unsigned char   MaxPacketSize0;
+    
+    unsigned short  VendorID;
+    unsigned short  ProductID;
+    unsigned short  bcdDevice;
 
     unsigned char   RootHubIndex;
-	unsigned char   DeviceAddress;
-	unsigned char   DeviceSpeed;
-	unsigned char   InterfaceCount;
-	//Interface       interface[MAX_INTERFACE_COUNT];
+    unsigned char   DeviceAddress;
+    unsigned char   DeviceSpeed;
+    unsigned char   InterfaceCount;
+    //Interface       interface[MAX_INTERFACE_COUNT];
 } USBdevice, *PUSBdevice;
 
 typedef USBdevice __xdata *PXUSBdevice;
@@ -128,9 +128,9 @@ struct _HIDdevice
 {
     unsigned char index;
     PXUSBdevice usbDevice;
-	unsigned char interface;
-	unsigned char endPoint;
-	unsigned long type;
+    unsigned char interface;
+    unsigned char endPoint;
+    unsigned long type;
     void (*inHandler)(PXHIDdevice hidDevice, PXUCHAR buf, unsigned char len) __reentrant;
 };
 
