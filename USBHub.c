@@ -57,7 +57,6 @@ unsigned char hub_getHubStatus(PXUSBdevice usbDevice)
     PXPORT_STATUS desc = (PXPORT_STATUS)receiveDataBuffer;
 	fillTxBuffer(hub_GetHubStatus, sizeof(hub_GetHubStatus));
     s = hostCtrlTransfer(usbDevice, receiveDataBuffer, &len, RECEIVE_BUFFER_LEN);
-    DEBUG_OUT("getHubStatus 0x%02x\n", s);
     if (s != ERR_SUCCESS)
         return s;
     DEBUG_OUT("hub - hub status: status %02x%02x, change %02x%02x\n", desc->wPortStatusH, desc->wPortStatusL, desc->wPortChangeH, desc->wPortChangeL);
@@ -74,7 +73,6 @@ unsigned char hub_setPortFeature(PXUSBdevice usbDevice, unsigned char port, unsi
     pSetupReq->wValueL = feature;
     pSetupReq->wIndexL = port;
     s = hostCtrlTransfer(usbDevice, receiveDataBuffer, &len, RECEIVE_BUFFER_LEN);
-    DEBUG_OUT("setPortFeature 0x%02x\n", s);
 	return s;                          
 }
 
@@ -88,7 +86,6 @@ unsigned char hub_clearPortFeature(PXUSBdevice usbDevice, unsigned char port, un
     pSetupReq->wValueL = feature;
     pSetupReq->wIndexL = port;
     s = hostCtrlTransfer(usbDevice, receiveDataBuffer, &len, RECEIVE_BUFFER_LEN);
-    DEBUG_OUT("clearPortFeature 0x%02x\n", s);
 	return s;                          
 }
 
@@ -101,7 +98,6 @@ unsigned char hub_getPortStatus(PXUSBdevice usbDevice, unsigned char port, unsig
 	fillTxBuffer(hub_GetPortStatus, sizeof(hub_GetPortStatus));
     pSetupReq->wIndexL = port;
     s = hostCtrlTransfer(usbDevice, receiveDataBuffer, &len, RECEIVE_BUFFER_LEN);
-    DEBUG_OUT("getPortStatus 0x%02x\n", s);
     if (s != ERR_SUCCESS)
         return s;
     DEBUG_OUT("hub - port %d status: status %02x%02x, change %02x%02x\n", port, desc->wPortStatusH, desc->wPortStatusL, desc->wPortChangeH, desc->wPortChangeL);

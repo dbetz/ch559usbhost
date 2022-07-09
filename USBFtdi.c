@@ -133,6 +133,7 @@ void ftdi_initialize(PXUSBdevice usbDevice)
 void ftdi_inHandler(PXHIDdevice hidDevice, PXUCHAR buf, unsigned char len) __reentrant
 {
     PXUSBdevice usbDevice = hidDevice->usbDevice;
+#if 0
     if (len >= 2) {
         DEBUG_OUT("Got FTDI input: modem 0x%02x, line 0x%02x\n", buf[0], buf[1]);
         for (int i = 2; i < len; ++i) {
@@ -140,5 +141,8 @@ void ftdi_inHandler(PXHIDdevice hidDevice, PXUCHAR buf, unsigned char len) __ree
         }
         DEBUG_OUT("\n");
     }
-    sendProtocolMSG(MSG_TYPE_UART_IN, len, 0, 0, 0, buf);
+#endif
+    if (len > 2) {
+        sendProtocolMSG(MSG_TYPE_UART_IN, len, 0, 0, 0, buf);
+    }
 }

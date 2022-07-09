@@ -251,14 +251,14 @@ unsigned char hostTransfer(unsigned char endp_pid, unsigned char tog, unsigned s
 }
 
 //todo request buffer
-unsigned char hostCtrlTransfer(PXUSBdevice usbDevice, unsigned char __xdata *DataBuf, unsigned short *RetLen, unsigned short maxLength)
+unsigned char hostCtrlTransferx(PXUSBdevice usbDevice, unsigned char __xdata *DataBuf, unsigned short *RetLen, unsigned short maxLength)
 {
     unsigned char temp = maxLength;
     unsigned short RemLen;
     unsigned char s, RxLen, i;
     unsigned char __xdata *pBuf;
     unsigned short *pLen;
-    DEBUG_OUT("hostCtrlTransfer\n");
+    DEBUG_OUT("hostCtrlTransfer 0x%02x", TxBuffer[1]);
     PXUSB_SETUP_REQ pSetupReq = ((PXUSB_SETUP_REQ)TxBuffer);
     pBuf = DataBuf;
     pLen = RetLen;
@@ -277,7 +277,7 @@ unsigned char hostCtrlTransfer(PXUSBdevice usbDevice, unsigned char __xdata *Dat
     { 
         if (pSetupReq->bRequestType & USB_REQ_TYP_IN)
         {
-            DEBUG_OUT("Remaining bytes to read %d\n", RemLen);
+            DEBUG_OUT(", Bytes to read %d", RemLen);
             while (RemLen)
             {
                 delayUs(300);
@@ -291,7 +291,7 @@ unsigned char hostCtrlTransfer(PXUSBdevice usbDevice, unsigned char __xdata *Dat
                 for(i = 0; i < RxLen; i++)
                     pBuf[i] = RxBuffer[i];
                 pBuf += RxLen;
-                DEBUG_OUT("Received %i bytes\n", (uint16_t)USB_RX_LEN);
+                DEBUG_OUT(", Received %i bytes", (uint16_t)USB_RX_LEN);
                 if (USB_RX_LEN == 0 || (USB_RX_LEN < endpoint0Size ))
                     break; 
             }
@@ -299,7 +299,7 @@ unsigned char hostCtrlTransfer(PXUSBdevice usbDevice, unsigned char __xdata *Dat
         }
         else
         {
-            DEBUG_OUT("Remaining bytes to write %i", RemLen);
+            DEBUG_OUT(", Bytes to write %d", RemLen);
             //todo rework this TxBuffer overwritten
             while (RemLen)
             {
@@ -314,7 +314,7 @@ unsigned char hostCtrlTransfer(PXUSBdevice usbDevice, unsigned char __xdata *Dat
 
                     DEBUG_OUT("SET_PORT  %02X  %02X ", *pBuf, SetPort);
                 }
-                DEBUG_OUT("Sending %i bytes\n", (uint16_t)UH_TX_LEN);
+                DEBUG_OUT(", Sending %i bytes", (uint16_t)UH_TX_LEN);
                 s = hostTransfer(USB_PID_OUT << 4, UH_TX_CTRL, 10000);
                 if (s != ERR_SUCCESS)
                     return (s);
@@ -335,13 +335,20 @@ unsigned char hostCtrlTransfer(PXUSBdevice usbDevice, unsigned char __xdata *Dat
     return (ERR_USB_BUF_OVER);
 }
 
+unsigned char hostCtrlTransfer(PXUSBdevice usbDevice, unsigned char __xdata *DataBuf, unsigned short *RetLen, unsigned short maxLength)
+{
+    unsigned char s = hostCtrlTransferx(usbDevice, DataBuf, RetLen, maxLength);
+    DEBUG_OUT(" -> 0x%02x\n", s);
+    return s;
+}
+
 void fillTxBuffer(PUINT8C data, unsigned char len)
 {
     unsigned char i;
-    DEBUG_OUT("fillTxBuffer %i bytes\n", len);
+    //DEBUG_OUT("fillTxBuffer %i bytes\n", len);
     for(i = 0; i < len; i++)
         TxBuffer[i] = data[i];
-    DEBUG_OUT("fillTxBuffer done\n", len);
+    //DEBUG_OUT("fillTxBuffer done\n", len);
 }
 
 unsigned char getDeviceDescriptor(PXUSBdevice usbDevice)
