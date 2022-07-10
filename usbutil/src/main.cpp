@@ -128,10 +128,8 @@ void sendProtocolMSG(unsigned char msgtype, unsigned short length, unsigned char
 	serialport->Write(txBuffer, PAYLOAD_START + length + 1);
 }
 
-bool Start()
+bool Start(const char *serialportName)
 {
-    auto serialportName = "/dev/ttyUSB0";
-
     cout << "Using " << serialportName << endl;
     serialport = make_unique<SerialPort>(serialportName);
     if (!serialport->Open()) {
@@ -181,7 +179,10 @@ void signalHandler(int signum)
 
 int main(int argc, const char *argv[])
 {
-    Start();
+    const char *port = "/dev/ttyUSB0";
+    if (argc > 1)
+        port = argv[1];
+    Start(port);
     while (!exitFlag);
     return 0;
 }

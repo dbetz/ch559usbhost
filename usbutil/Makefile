@@ -1,11 +1,9 @@
 BUILD_DIR=build
 MKDIR_P = mkdir -p
 
-# sudo apt install build-essential gcc g++ libstdc++6 libudev-dev
-
-CFLAGS += -DRASPBERRY_PI -Wno-psabi -pthread -latomic
+CFLAGS += -pthread
 CPPFLAGS += $(CFLAGS) -std=c++14
-LIBS += -lstdc++ -lpigpio -ludev -Wl,-Bstatic -lwebsockets -lssl -lcrypto -Wl,-Bdynamic -ldl -s
+LIBS += -lstdc++
 
 TARGET=usbutil
 

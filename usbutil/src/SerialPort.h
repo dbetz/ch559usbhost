@@ -20,5 +20,3 @@ private:
 	SerialPort(const SerialPort&) = delete;
 	SerialPort& operator=(const SerialPort&) = delete;
 };
-
-std::string GetSerialPortName();
