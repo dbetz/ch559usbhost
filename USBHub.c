@@ -147,12 +147,10 @@ void hub_inHandler(PXHIDdevice hidDevice, PXUCHAR buf, unsigned char len) __reen
                         initializeConnection(newUsbDevice);
                     }
                 }
-                if (changed(change, HUB_PORT_ENABLE)) {
+                if (changed(change, HUB_PORT_STATUS_ENABLE)) {
                     hub_clearPortFeature(usbDevice, port, HUB_C_PORT_ENABLE);
                 }
             }
         }
     }
 }
-
-
