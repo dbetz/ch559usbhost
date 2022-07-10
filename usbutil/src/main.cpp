@@ -106,6 +106,28 @@ void SerialReadThread()
     }
 }
 
+void sendProtocolMSG(unsigned char msgtype, unsigned short length, unsigned char type, unsigned char device, unsigned char endpoint, unsigned char *msgbuffer)
+{
+    uint8_t txBuffer[128], *p = txBuffer;
+    unsigned short i;
+    *p++ = 0xFE;	
+	*p++ = length;
+	*p++ = (unsigned char)(length>>8);
+	*p++ = msgtype;
+	*p++ = type;
+	*p++ = device;
+	*p++ = endpoint;
+	*p++ = 0);
+	*p++ = 0);
+	*p++ = 0);
+	*p++ = 0);
+	for (int i = 0; i < length; i++) {
+		*p++ = msgbuffer[i];
+	}
+	*p++ = '\n';
+	serialport->Write(txBuffer, PAYLOAD_START + length + 1)
+}
+
 bool Start()
 {
     auto serialportName = "/dev/ttyUSB0";
