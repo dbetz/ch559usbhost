@@ -117,15 +117,15 @@ void sendProtocolMSG(unsigned char msgtype, unsigned short length, unsigned char
 	*p++ = type;
 	*p++ = device;
 	*p++ = endpoint;
-	*p++ = 0);
-	*p++ = 0);
-	*p++ = 0);
-	*p++ = 0);
+	*p++ = 0;
+	*p++ = 0;
+	*p++ = 0;
+	*p++ = 0;
 	for (int i = 0; i < length; i++) {
 		*p++ = msgbuffer[i];
 	}
 	*p++ = '\n';
-	serialport->Write(txBuffer, PAYLOAD_START + length + 1)
+	serialport->Write(txBuffer, PAYLOAD_START + length + 1);
 }
 
 bool Start()
