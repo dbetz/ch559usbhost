@@ -84,7 +84,7 @@ void SerialReadThread()
                             putchar(packet[i]);
                     }
                     else {
-                        printf("msgtype %02x, type %02x, length %d\n", packet[MSGTYPE_OFFSET], packet[4], length);
+                        printf("OUT: msgtype %02x, type %02x, length %d\n", packet[MSGTYPE_OFFSET], packet[4], length);
                         for (int i = HDR_START; i < PAYLOAD_START; ++i)
                             printf(" %02x", packet[i]);
                         putchar('\n');

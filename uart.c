@@ -1,4 +1,3 @@
-
 #include <stdint.h>
 #include <stdio.h>
 #include <string.h>
@@ -6,30 +5,83 @@
 #include "util.h"
 #include "uart.h"
 
-uint8_t __xdata uartRxBuff[64];
-uint8_t __xdata rxPos = 0;
+enum State {
+    STATE_SOP,
+    STATE_LEN1,
+    STATE_LEN2,
+    STATE_HDR,
+    STATE_PAYLOAD,
+    STATE_EOP
+};
 
+#define MAX_PACKET_SIZE 1024
+unsigned char __xdata packet[MAX_PACKET_SIZE];
+int index = 0;
+int length;
+int remaining;
+State state = STATE_SOP;
 
 void processUart(){
     while(RI){
-            RI=0;
-            uartRxBuff[rxPos] = SBUF;
-            if (uartRxBuff[rxPos]=='\n' || rxPos >= 64){
-                for (uint8_t i = 0; i < rxPos; i ++ )
-                    {
-                        printf( "0x%02X ",uartRxBuff[i]);
-                    }
-                    printf("\n");
-                if(uartRxBuff[0]=='k'){
-                //if(uartRxBuff[1]==0x61)LED=0;
-                //if(uartRxBuff[1]==0x73)LED=1;
-                if(uartRxBuff[1]=='b')runBootloader();
-                }
-            rxPos=0;
-            }else{
-            rxPos++;
+        unsigned char in = SBUF;
+        RI=0;
+        case STATE_SOP:
+            index = 0;
+            if (in == 0xFE) {
+                packet[index++] = rxBuffer[i];
+                state = STATE_LEN1;
             }
+            break;
+        case STATE_LEN1:
+            length = in;
+            packet[index++] = in;
+            state = STATE_LEN2;
+            break;
+        case STATE_LEN2:
+            length |= in << 8;
+            packet[index++] = in;
+            state = STATE_HDR;
+            break;
+        case STATE_HDR:
+            packet[index++] = in;
+            if (index == PAYLOAD_START) {
+                if (length > 0) {
+                    remaining = length;
+                    state = STATE_PAYLOAD;
+                }
+                else {
+                    state = STATE_EOP;
+                }
+            }
+            break;
+        case STATE_PAYLOAD:
+            packet[index++] = in;
+            if (--remaining <= 0) {
+                state = STATE_EOP;
+            }
+            break;
+        case STATE_EOP:
+            if (in == '\n') {
+                int payloadEnd = PAYLOAD_START + length;
+                packet[index++] = in;
+                DEBUG_OUT("IN: msgtype %02x, type %02x, length %d\n", packet[MSGTYPE_OFFSET], packet[4], length);
+                for (int i = HDR_START; i < PAYLOAD_START; ++i)
+                    DEBUG_OUT(" %02x", packet[i]);
+                DEBUG_OUT('\n');
+                if (length > 0) {
+                    for (int i = PAYLOAD_START; i < payloadEnd; ++i)
+                        DEBUG_OUT(" %02x", packet[i]);
+                    DEBUG_OUT('\n');
+                }
+                // handle complete packet
+            }
+            state = STATE_SOP;
+            break;
+        default:
+            state = STATE_SOP;
+            break;
         }
+    }
 }
 
 void sendProtocolMSG(unsigned char msgtype, unsigned short length, unsigned char type, unsigned char device, unsigned char endpoint, unsigned char __xdata *msgbuffer){
