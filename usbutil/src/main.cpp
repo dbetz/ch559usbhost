@@ -43,7 +43,7 @@ void SerialReadThread()
             case STATE_SOP:
                 index = 0;
                 if (in == 0xFE) {
-                    packet[index++] = rxBuffer[i];
+                    packet[index++] = in;
                     state = STATE_LEN1;
                 }
                 break;
