@@ -5,17 +5,21 @@
 #include "util.h"
 #include "uart.h"
 
-enum State {
+typedef enum {
     STATE_SOP,
     STATE_LEN1,
     STATE_LEN2,
     STATE_HDR,
     STATE_PAYLOAD,
     STATE_EOP
-};
+} State;
 
-#define MAX_PACKET_SIZE 1024
-unsigned char __xdata packet[MAX_PACKET_SIZE];
+unsigned char __xdata packet[128];
+
+#define MSGTYPE_OFFSET  3
+#define HDR_START       3
+#define PAYLOAD_START   11
+
 int index = 0;
 int length;
 int remaining;
@@ -25,10 +29,11 @@ void processUart(){
     while(RI){
         unsigned char in = SBUF;
         RI=0;
+        switch (state) {
         case STATE_SOP:
             index = 0;
             if (in == 0xFE) {
-                packet[index++] = rxBuffer[i];
+                packet[index++] = in;
                 state = STATE_LEN1;
             }
             break;
@@ -67,11 +72,11 @@ void processUart(){
                 DEBUG_OUT("IN: msgtype %02x, type %02x, length %d\n", packet[MSGTYPE_OFFSET], packet[4], length);
                 for (int i = HDR_START; i < PAYLOAD_START; ++i)
                     DEBUG_OUT(" %02x", packet[i]);
-                DEBUG_OUT('\n');
+                DEBUG_OUT("\n");
                 if (length > 0) {
                     for (int i = PAYLOAD_START; i < payloadEnd; ++i)
                         DEBUG_OUT(" %02x", packet[i]);
-                    DEBUG_OUT('\n');
+                    DEBUG_OUT("\n");
                 }
                 // handle complete packet
             }
