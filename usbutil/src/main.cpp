@@ -107,6 +107,16 @@ void SerialReadThread()
     }
 }
 
+void serialSetLineConfig(uint8_t port, uint8_t dataBits, uint8_t parityType, uint8_t charFormat)
+{
+    SerialSetLineConfig payload;
+    payload.port = port;
+    payload.dataBits = dataBits;
+    payload.parityType = parityType;
+    payload.charFormat = charFormat;
+    sendMessage(MSG_TYPE_SERIAL_SET_CONFIG, &payload, sizeof(payload));
+}
+
 void sendMessage(unsigned char type, unsigned char *payload, int length)
 {
     uint8_t txBuffer[128], *p = txBuffer;
