@@ -77,7 +77,7 @@ static unsigned char ftdi_reset(PXUSBdevice usbDevice)
 	return s;                          
 }
 
-static unsigned char ftdi_setBaudRate(PXUSBdevice usbDevice, uint32_t baudRate)
+unsigned char ftdi_setBaudRate(PXUSBdevice usbDevice, uint32_t baudRate)
 {
 	PXUSB_SETUP_REQ pSetupReq = ((PXUSB_SETUP_REQ)TxBuffer);
     uint16_t wIndex, wValue;
@@ -93,7 +93,7 @@ static unsigned char ftdi_setBaudRate(PXUSBdevice usbDevice, uint32_t baudRate)
 	return s;                          
 }
 
-static unsigned char ftdi_setCharCoding(PXUSBdevice usbDevice, uint8_t dataBits, uint8_t parityType, uint8_t charFormat)
+unsigned char ftdi_setCharCoding(PXUSBdevice usbDevice, uint8_t dataBits, uint8_t parityType, uint8_t charFormat)
 {
 	PXUSB_SETUP_REQ pSetupReq = ((PXUSB_SETUP_REQ)TxBuffer);
     uint16_t wValue = dataBits | (parityType << 8) | (charFormat << 11);
@@ -119,7 +119,7 @@ void ftdi_initialize(PXUSBdevice usbDevice)
         DEBUG_OUT("Got FTDI reset response\n");
         DEBUG_OUT_USB_BUFFER(receiveDataBuffer);
     }
-    sendProtocolMSG(MSG_TYPE_SERIAL_CONNECTED, 0, 0, 0, 0, 0);
+    sendProtocolMSG(MSG_TYPE_SERIAL_CONNECTED, 0, usbDevice->Index, 0, 0, 0);
     s = ftdi_setBaudRate(usbDevice, 230400);
     if (s == ERR_SUCCESS) {
         DEBUG_OUT("Got FTDI set baud rate response\n");

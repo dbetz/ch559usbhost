@@ -104,7 +104,8 @@ typedef ConnectedDevice __xdata *PXConnectedDevice;
 
 typedef struct
 {
-    int             InUse;
+    unsigned char   Index;
+    unsigned char   InUse;
     unsigned char   DeviceClass;
     unsigned char   MaxPacketSize0;
     
@@ -142,6 +143,7 @@ void resetHubDevices(unsigned char hubindex);
 void pollHIDdevice();
 
 PXUSBdevice addUSBdevice(unsigned char rootHubIndex);
+PXUSBdevice getUSBdevice(unsigned char index);
 void selectHubPort(unsigned char rootHubIndex, unsigned char addr);
 void fillTxBuffer(PUINT8C data, unsigned char len);
 unsigned char hostCtrlTransfer(PXUSBdevice usbDevice, unsigned char __xdata *DataBuf, unsigned short *RetLen, unsigned short maxLength);
@@ -169,6 +171,8 @@ void hub_inHandler(PXHIDdevice hidDevice, PXUCHAR buf, unsigned char len) __reen
 // USBFtdi.c
 int ftdi_check(PXUSBdevice usbDevice);
 void ftdi_initialize(PXUSBdevice usbDevice);
+unsigned char ftdi_setBaudRate(PXUSBdevice usbDevice, uint32_t baudRate);
+unsigned char ftdi_setCharCoding(PXUSBdevice usbDevice, uint8_t dataBits, uint8_t parityType, uint8_t charFormat);
 void ftdi_inHandler(PXHIDdevice hidDevice, PXUCHAR buf, unsigned char len) __reentrant;
 
 #endif

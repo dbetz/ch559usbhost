@@ -27,6 +27,19 @@ static const int MSGTYPE_OFFSET = 3;
 static const int HDR_START = 3;   // SOP, LEN1, and LEN2
 static const int PAYLOAD_START = 11; // SOP, LEN1, LEN2, and 8 bytes of header
 
+void showPacket(uint8_t *packet, int length)
+{
+    printf("OUT: msgtype %02x, type %02x, length %d\n", packet[MSGTYPE_OFFSET], packet[4], length);
+    for (int i = HDR_START; i < PAYLOAD_START; ++i)
+        printf(" %02x", packet[i]);
+    putchar('\n');
+    if (length > 0) {
+        for (int i = PAYLOAD_START; i < payloadEnd; ++i)
+            printf(" %02x", packet[i]);
+        putchar('\n');
+    }
+}
+
 void SerialReadThread()
 {
     int index = 0;
@@ -80,21 +93,29 @@ void SerialReadThread()
                 if (in == '\n') {
                     int payloadEnd = PAYLOAD_START + length;
                     packet[index++] = in;
-                    if (packet[MSGTYPE_OFFSET] == 9) {
+                    switch (packet[MSGTYPE_OFFSET]) {
+                    case MSG_TYPE_CONNECTED:
+                    case MSG_TYPE_DISCONNECTED:
+                    case MSG_TYPE_ERROR:
+                    case MSG_TYPE_DEVICE_POLL:
+                    case MSG_TYPE_DEVICE_STRING:
+                    case MSG_TYPE_DEVICE_INFO:
+                    case MSG_TYPE_HID_INFO:
+                    case MSG_TYPE_STARTUP:
+                        showPacket(packet, length);
+                        break;
+                    case MSG_TYPE_DEBUG:
                         for (int i = PAYLOAD_START; i < payloadEnd; ++i)
                             putchar(packet[i]);
-                    }
-                    else {
-                        printf("OUT: msgtype %02x, type %02x, length %d\n", packet[MSGTYPE_OFFSET], packet[4], length);
-                        for (int i = HDR_START; i < PAYLOAD_START; ++i)
-                            printf(" %02x", packet[i]);
-                        putchar('\n');
-                        if (length > 0) {
-                            for (int i = PAYLOAD_START; i < payloadEnd; ++i)
-                                printf(" %02x", packet[i]);
-                            putchar('\n');
-                        }
-                        // handle complete packet
+                        break;
+                    case MSG_TYPE_SERIAL_CONNECTED:
+                        serialSetLineConfig(packet[5], 230400, 8, 0, 0);
+                        break;
+                    case MSG_TYPE_SERIAL_DISCONNECTED:
+                    case MSG_TYPE_SERIAL_OUT:
+                    default:
+                        showPacket(packet, length);
+                        break;
                     }
                 }
                 state = STATE_SOP;
@@ -191,7 +212,6 @@ int main(int argc, const char *argv[])
     if (argc > 1)
         port = argv[1];
     Start(port);
-    serialSetLineConfig(0, 230400, 8, 0, 0);
     while (!exitFlag);
     return 0;
 }

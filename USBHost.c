@@ -501,12 +501,21 @@ PXUSBdevice addUSBdevice(unsigned char rootHubIndex)
     for (int i = 0; i < MAX_DEVICES; ++i) {
         if (!usbDevices[i].InUse) {
             PXUSBdevice usbDevice = &usbDevices[i];
+            usbDevice->Index = i;
             usbDevice->InUse = TRUE;
             usbDevice->RootHubIndex = rootHubIndex;
             usbDevice->DeviceAddress = 0x00;
             DEBUG_OUT("addUSBdevice: %d\n", i);
             return usbDevice;
         }
+    }
+    return NULL;
+}
+
+PXUSBdevice getUSBdevice(unsigned char index)
+{
+    if (index < MAX_DEVICES && usbDevices[index].InUse) {
+        return &usbDevices[index];
     }
     return NULL;
 }

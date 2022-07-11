@@ -4,6 +4,7 @@
 #include "CH559.h"
 #include "util.h"
 #include "uart.h"
+#include "USBHost.h"
 #include "protocol.h"
 
 typedef enum {
@@ -69,15 +70,31 @@ void processUart(){
                 int payloadEnd = PAYLOAD_START + length;
                 packet[index++] = in;
                 DEBUG_OUT("IN: type %02x, length %d\n", type, length);
-                for (int i = 0; i < PAYLOAD_START; ++i)
-                    DEBUG_OUT(" %02x", packet[i]);
-                DEBUG_OUT("\n");
                 if (length > 0) {
                     for (int i = PAYLOAD_START; i < payloadEnd; ++i)
                         DEBUG_OUT(" %02x", packet[i]);
                     DEBUG_OUT("\n");
                 }
-                // handle complete packet
+                switch (type) {
+                case MSG_TYPE_SERIAL_SET_CONFIG:
+                    if (length == sizeof(SerialSetLineConfig)) {
+                        SerialSetLineConfig __xdata *config = (SerialSetLineConfig __xdata *)&packet[PAYLOAD_START];
+                        PXUSBdevice usbDevice = getUSBdevice(config->port);
+                        if (usbDevice != NULL) {
+                            uint32_t baudRate = (uint32_t)config->baudRate0;
+                            baudRate |= (uint32_t)config->baudRate1 << 8;
+                            baudRate |= (uint32_t)config->baudRate2 << 16;
+                            baudRate |= (uint32_t)config->baudRate3 << 24;
+                            ftdi_setBaudRate(usbDevice, baudRate);
+                            ftdi_setCharCoding(usbDevice, config->dataBits, config->parityType, config->charFormat);
+                        }
+                    }
+                    break;
+                case MSG_TYPE_SERIAL_OUT:
+                    break;
+                default:
+                    break;
+                }
             }
             state = STATE_SOP;
             break;
