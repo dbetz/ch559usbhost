@@ -120,6 +120,7 @@ void ftdi_initialize(PXUSBdevice usbDevice)
         DEBUG_OUT_USB_BUFFER(receiveDataBuffer);
     }
     sendProtocolMSG(MSG_TYPE_SERIAL_CONNECTED, 0, usbDevice->Index, 0, 0, 0);
+#if 0
     s = ftdi_setBaudRate(usbDevice, 230400);
     if (s == ERR_SUCCESS) {
         DEBUG_OUT("Got FTDI set baud rate response\n");
@@ -130,6 +131,7 @@ void ftdi_initialize(PXUSBdevice usbDevice)
         DEBUG_OUT("Got FTDI set char coding response\n");
         DEBUG_OUT_USB_BUFFER(receiveDataBuffer);
     }
+#endif
 }
 
 void ftdi_inHandler(PXHIDdevice hidDevice, PXUCHAR buf, unsigned char len) __reentrant

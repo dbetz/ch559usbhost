@@ -95,30 +95,32 @@ void SerialReadThread()
             case STATE_EOP:
                 if (in == '\n') {
                     int payloadEnd = PAYLOAD_START + length;
+                    int msgType = packet[MSGTYPE_OFFSET];
                     packet[index++] = in;
-                    switch (packet[MSGTYPE_OFFSET]) {
-                    case MSG_TYPE_CONNECTED:
-                    case MSG_TYPE_DISCONNECTED:
-                    case MSG_TYPE_ERROR:
-                    case MSG_TYPE_DEVICE_POLL:
-                    case MSG_TYPE_DEVICE_STRING:
-                    case MSG_TYPE_DEVICE_INFO:
-                    case MSG_TYPE_HID_INFO:
-                    case MSG_TYPE_STARTUP:
-                        showPacket(packet, length);
-                        break;
-                    case MSG_TYPE_DEBUG:
+                    if (msgType == MSG_TYPE_DEBUG) {
                         for (int i = PAYLOAD_START; i < payloadEnd; ++i)
                             putchar(packet[i]);
-                        break;
-                    case MSG_TYPE_SERIAL_CONNECTED:
-                        serialSetLineConfig(packet[5], 230400, 8, 0, 0);
-                        break;
-                    case MSG_TYPE_SERIAL_DISCONNECTED:
-                    case MSG_TYPE_SERIAL_OUT:
-                    default:
+                    }
+                    else {
                         showPacket(packet, length);
-                        break;
+                        switch (msgType) {
+                        case MSG_TYPE_CONNECTED:
+                        case MSG_TYPE_DISCONNECTED:
+                        case MSG_TYPE_ERROR:
+                        case MSG_TYPE_DEVICE_POLL:
+                        case MSG_TYPE_DEVICE_STRING:
+                        case MSG_TYPE_DEVICE_INFO:
+                        case MSG_TYPE_HID_INFO:
+                        case MSG_TYPE_STARTUP:
+                            break;
+                        case MSG_TYPE_SERIAL_CONNECTED:
+                            serialSetLineConfig(packet[5], 230400, 8, 0, 0);
+                            break;
+                        case MSG_TYPE_SERIAL_DISCONNECTED:
+                        case MSG_TYPE_SERIAL_OUT:
+                        default:
+                            break;
+                        }
                     }
                 }
                 state = STATE_SOP;
