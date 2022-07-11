@@ -5,7 +5,7 @@
 #include <unistd.h>
 #include <signal.h>
 
-#include "../protocol.h"
+#include "../../protocol.h"
 #include "SerialPort.h"
 
 using namespace std;
