@@ -129,7 +129,7 @@ void serialSetLineConfig(uint8_t port, uint8_t dataBits, uint8_t parityType, uin
     payload.dataBits = dataBits;
     payload.parityType = parityType;
     payload.charFormat = charFormat;
-    sendMessage(MSG_TYPE_SERIAL_SET_CONFIG, &payload, sizeof(payload));
+    sendMessage(MSG_TYPE_SERIAL_SET_CONFIG, (uint8_t *)&payload, sizeof(payload));
 }
 
 bool Start(const char *serialportName)
