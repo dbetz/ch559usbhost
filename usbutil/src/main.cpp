@@ -27,6 +27,8 @@ static const int MSGTYPE_OFFSET = 3;
 static const int HDR_START = 3;   // SOP, LEN1, and LEN2
 static const int PAYLOAD_START = 11; // SOP, LEN1, LEN2, and 8 bytes of header
 
+void serialSetLineConfig(uint8_t port, uint32_t baudRate, uint8_t dataBits, uint8_t parityType, uint8_t charFormat);
+
 void showPacket(uint8_t *packet, int length)
 {
     printf("OUT: msgtype %02x, type %02x, length %d\n", packet[MSGTYPE_OFFSET], packet[4], length);
@@ -34,6 +36,7 @@ void showPacket(uint8_t *packet, int length)
         printf(" %02x", packet[i]);
     putchar('\n');
     if (length > 0) {
+        int payloadEnd = PAYLOAD_START + length;
         for (int i = PAYLOAD_START; i < payloadEnd; ++i)
             printf(" %02x", packet[i]);
         putchar('\n');
