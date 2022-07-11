@@ -34,10 +34,10 @@ typedef struct {
 
 typedef struct {
     uint8_t port;
-    uint8_t baud0;
-    uint8_t baud1;
-    uint8_t baud2;
-    uint8_t baud3;
+    uint8_t baudRate0;
+    uint8_t baudRate1;
+    uint8_t baudRate2;
+    uint8_t baudRate3;
     uint8_t dataBits;
     uint8_t parityType;
     uint8_t charFormat;

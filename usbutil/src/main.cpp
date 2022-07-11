@@ -122,10 +122,14 @@ void sendMessage(unsigned char type, unsigned char *payload, int length)
 	serialport->Write(txBuffer, p - txBuffer);
 }
 
-void serialSetLineConfig(uint8_t port, uint8_t dataBits, uint8_t parityType, uint8_t charFormat)
+void serialSetLineConfig(uint8_t port, uint32_t baudRate, uint8_t dataBits, uint8_t parityType, uint8_t charFormat)
 {
     SerialSetLineConfig payload;
     payload.port = port;
+    payload.baudRate0 = baudRate;
+    payload.baudRate1 = baudRate >> 8;
+    payload.baudRate2 = baudRate >> 16;
+    payload.baudRate3 = baudRate >> 24;
     payload.dataBits = dataBits;
     payload.parityType = parityType;
     payload.charFormat = charFormat;
