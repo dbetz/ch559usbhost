@@ -187,6 +187,7 @@ int main(int argc, const char *argv[])
     if (argc > 1)
         port = argv[1];
     Start(port);
+    serialSetLineConfig(0, 230400, 8, 0, 0);
     while (!exitFlag);
     return 0;
 }
