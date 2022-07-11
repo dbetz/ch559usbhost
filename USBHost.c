@@ -3,6 +3,7 @@
 #include "util.h"
 #include "uart.h"
 #include <string.h>
+#include "protocol.h"
 
 SBIT(LED, 0x90, 6);
 

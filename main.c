@@ -11,6 +11,7 @@ typedef unsigned char  __data             UINT8D;
 #include "util.h"
 #include "USBHost.h"
 #include "uart.h"
+#include "protocol.h"
 
 SBIT(LED, 0x90, 6);
 SBIT(LED32, 0xB0, 2);

@@ -4,24 +4,24 @@
 #include "CH559.h"
 #include "util.h"
 #include "uart.h"
+#include "protocol.h"
 
 typedef enum {
     STATE_SOP,
     STATE_LEN1,
     STATE_LEN2,
-    STATE_HDR,
+    STATE_TYPE,
     STATE_PAYLOAD,
     STATE_EOP
 } State;
 
 unsigned char __xdata packet[128];
 
-#define MSGTYPE_OFFSET  3
-#define HDR_START       3
-#define PAYLOAD_START   11
+#define PAYLOAD_START   4
 
 int index = 0;
 int length;
+unsigned char type;
 int remaining;
 State state = STATE_SOP;
 
@@ -45,18 +45,17 @@ void processUart(){
         case STATE_LEN2:
             length |= in << 8;
             packet[index++] = in;
-            state = STATE_HDR;
+            state = STATE_TYPE;
             break;
-        case STATE_HDR:
+        case STATE_TYPE:
+            type = in;
             packet[index++] = in;
-            if (index == PAYLOAD_START) {
-                if (length > 0) {
-                    remaining = length;
-                    state = STATE_PAYLOAD;
-                }
-                else {
-                    state = STATE_EOP;
-                }
+            if (length > 0) {
+                remaining = length;
+                state = STATE_PAYLOAD;
+            }
+            else {
+                state = STATE_EOP;
             }
             break;
         case STATE_PAYLOAD:
@@ -69,8 +68,8 @@ void processUart(){
             if (in == '\n') {
                 int payloadEnd = PAYLOAD_START + length;
                 packet[index++] = in;
-                DEBUG_OUT("IN: msgtype %02x, type %02x, length %d\n", packet[MSGTYPE_OFFSET], packet[4], length);
-                for (int i = HDR_START; i < PAYLOAD_START; ++i)
+                DEBUG_OUT("IN: type %02x, length %d\n", type, length);
+                for (int i = 0; i < PAYLOAD_START; ++i)
                     DEBUG_OUT(" %02x", packet[i]);
                 DEBUG_OUT("\n");
                 if (length > 0) {

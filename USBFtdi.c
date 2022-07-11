@@ -2,6 +2,7 @@
 #include "USBHost.h"
 #include "util.h"
 #include "uart.h"
+#include "protocol.h"
 
 #define FT232_VENDOR_ID       0x0403
 #define FT232_PRODUCT_ID      0x6001

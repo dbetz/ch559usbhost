@@ -2,6 +2,7 @@
 #include "USBHost.h"
 #include "util.h"
 #include "uart.h"
+#include "protocol.h"
 
 #define REPORT_USAGE_PAGE 		0x04
 #define REPORT_USAGE 			0x08
