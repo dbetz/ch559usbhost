@@ -45,6 +45,7 @@ typedef struct {
 
 typedef struct {
     uint8_t port;
+    uint16_t length;
 } SerialWriteHdr;
 
 #ifdef __cplusplus

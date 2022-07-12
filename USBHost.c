@@ -563,6 +563,21 @@ void pollHIDdevice()
     }
 }
 
+unsigned char writeEndpoint(PXHIDdevice hidDevice, PXUCHAR buffer, int length)
+{
+    unsigned char s;
+    while (length > 0) {
+        unsigned short txLen = length >= endpoint0Size ? endpoint0Size : length;
+        for (int i = 0; i < txLen; ++i)
+            TxBuffer[i] = buffer[i];
+        UH_TX_LEN = txLen;
+        s = hostTransfer((USB_PID_OUT << 4) | (hidDevice->endPoint & 0x7F), UH_TX_CTRL, 10000);
+        if (s != ERR_SUCCESS) break;
+        length -= txLen;
+    }
+    return s;
+}
+
 void readInterface(PXUSB_ITF_DESCR interface)
 {
     DEBUG_OUT("Interface %d\n", interface->bInterfaceNumber);

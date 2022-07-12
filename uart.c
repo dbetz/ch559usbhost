@@ -91,6 +91,13 @@ void processUart(){
                     }
                     break;
                 case MSG_TYPE_SERIAL_OUT:
+                    if (length == sizeof(SerialWriteHdr)) {
+                        SerialWriteHdr __xdata *hdr = (SerialWriteHdr __xdata *)&packet[PAYLOAD_START];
+                        PXUSBdevice usbDevice = getUSBdevice(hdr->port);
+                        if (usbDevice != NULL) {
+                            //writeEndpoint();
+                        }
+                    }
                     break;
                 default:
                     break;

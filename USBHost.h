@@ -147,6 +147,7 @@ PXUSBdevice getUSBdevice(unsigned char index);
 void selectHubPort(unsigned char rootHubIndex, unsigned char addr);
 void fillTxBuffer(PUINT8C data, unsigned char len);
 unsigned char hostCtrlTransfer(PXUSBdevice usbDevice, unsigned char __xdata *DataBuf, unsigned short *RetLen, unsigned short maxLength);
+unsigned char writeEndpoint(PXHIDdevice hidDevice, PXUCHAR buffer, int length);
 void DEBUG_OUT_USB_BUFFER(unsigned char __xdata *usbBuffer);
 unsigned char initializeConnection(PXUSBdevice usbDevice);
 
